@@ -795,10 +795,14 @@ func (am *DefaultAccountManager) LoginPeer(ctx context.Context, login PeerLogin)
 		}
 	}
 
+	//Purpose is to ask admin to validate any change
 	isRequiresApproval, isStatusChanged, err := am.integratedPeerValidator.IsNotValidPeer(ctx, accountID, peer, grps, settings.Extra)
 	if err != nil {
 		return nil, nil, nil, err
 	}
+
+	// FIXME: should be checked in IsNotValidPeer
+	log.Infof("peer %s with serial %s,is logging in with serial: %s", peer.ID, peer.Meta.SystemSerialNumber, login.Meta.SystemSerialNumber)
 
 	updated := peer.UpdateMetaIfNew(login.Meta)
 	if updated {
