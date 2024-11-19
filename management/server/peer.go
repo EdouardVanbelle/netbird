@@ -795,9 +795,18 @@ func (am *DefaultAccountManager) LoginPeer(ctx context.Context, login PeerLogin)
 		}
 	}
 
+	//Purpose is to ask admin to validate any change
 	isRequiresApproval, isStatusChanged, err := am.integratedPeerValidator.IsNotValidPeer(ctx, accountID, peer, grps, settings.Extra)
 	if err != nil {
 		return nil, nil, nil, err
+	}
+
+	// FIXME: should be checked in IsNotValidPeer
+	if peer.Meta.SystemSerialNumber != login.Meta.SystemSerialNumber {
+		log.Infof("peer %s known with serial %s has changed host with a new serial: %s", peer.ID, peer.Meta.SystemSerialNumber, login.Meta.SystemSerialNumber)
+	}
+	else{
+		log.Infof("peer %s known with serial %s is logging in with same serial", peer.ID, peer.Meta.SystemSerialNumber)
 	}
 
 	updated := peer.UpdateMetaIfNew(login.Meta)
